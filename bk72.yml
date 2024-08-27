@@ -1,0 +1,63 @@
+esphome:
+  name: bk72
+
+bk72xx:
+  board: cb2s
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  - platform: esphome
+    password: !secret esphome_password
+
+wifi:
+  networks:
+    - ssid: !secret wifi1_ssid
+      password: !secret wifi1_password
+    - ssid: !secret wifi2_ssid
+      password: !secret wifi2_password
+    - ssid: !secret wifi3_ssid
+      password: !secret wifi3_password
+  power_save_mode: none
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Bk72 Fallback Hotspot"
+    password: !secret ap_password
+
+captive_portal:
+
+
+binary_sensor:
+  - platform: gpio
+    pin: 8
+    name: "Button"
+    on_press:
+      then:
+        - logger.log: Button Pressed
+        - switch.toggle: Relay
+        - switch.toggle: LED
+        - delay: 2s
+        - switch.toggle: LED
+
+# Outputs    
+switch:
+  - platform: gpio
+    name: Relay
+    id: Relay
+    restore_mode: RESTORE_DEFAULT_OFF
+    pin:
+      number: 24
+      inverted: true
+
+  - platform: gpio
+    name: LED
+    id: LED
+    pin:
+      number: 7
+      inverted: true
